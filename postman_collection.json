@@ -1,0 +1,514 @@
+{
+  "info": {
+    "name": "API MICASA",
+    "description": "Colección completa de endpoints de la API MICASA para gestión de iglesia",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.data.token);",
+                  "    pm.environment.set('jwt_token', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"admin\",\n  \"clave\": \"Admin123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Autenticar usuario y obtener token JWT"
+          }
+        },
+        {
+          "name": "Obtener Usuario Actual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar Contraseña",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"claveActual\": \"Admin123!\",\n  \"claveNueva\": \"NuevaPassword456!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Personas",
+      "item": [
+        {
+          "name": "Listar Personas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["personas"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        }
+,
+        {
+          "name": "Obtener Persona por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas/1",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "1"]
+            }
+          }
+        },
+        {
+          "name": "Buscar por Identificación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas/identificacion/1234567890",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "identificacion", "1234567890"]
+            }
+          }
+        },
+        {
+          "name": "Buscar por Nombre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas/search?q=Juan",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "search"],
+              "query": [{"key": "q", "value": "Juan"}]
+            }
+          }
+        },
+        {
+          "name": "Crear Persona",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primer_nombre\": \"María\",\n  \"primer_apellido\": \"González\",\n  \"identificacion\": \"9876543210\",\n  \"tipo_identificacion\": \"CC\",\n  \"genero\": \"F\",\n  \"fecha_nacimiento\": \"1995-03-20\",\n  \"estado_civil\": \"S\",\n  \"celular\": \"3109876543\",\n  \"email\": \"maria.gonzalez@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/personas",
+              "host": ["{{base_url}}"],
+              "path": ["personas"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar Persona",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"celular\": \"3209876543\",\n  \"direccion\": \"Nueva Dirección 123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/personas/2",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "2"]
+            }
+          }
+        }
+,
+        {
+          "name": "Eliminar Persona",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/personas/2",
+              "host": ["{{base_url}}"],
+              "path": ["personas", "2"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_persona\": 2,\n  \"usuario\": \"mgonzalez\",\n  \"clave\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Asignar Rol",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_rol\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios/2/roles",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "2", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Roles de Usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios/2/roles",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "2", "roles"]
+            }
+          }
+        }
+,
+        {
+          "name": "Obtener Permisos de Usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios/2/permisos",
+              "host": ["{{base_url}}"],
+              "path": ["usuarios", "2", "permisos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Listar Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": ["{{base_url}}"],
+              "path": ["roles"]
+            }
+          }
+        },
+        {
+          "name": "Crear Rol",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Secretario\",\n  \"descripcion\": \"Gestiona información administrativa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": ["{{base_url}}"],
+              "path": ["roles"]
+            }
+          }
+        },
+        {
+          "name": "Asignar Permiso a Rol",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_permiso\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/roles/3/permisos",
+              "host": ["{{base_url}}"],
+              "path": ["roles", "3", "permisos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ministerios",
+      "item": [
+        {
+          "name": "Listar Ministerios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ministerios",
+              "host": ["{{base_url}}"],
+              "path": ["ministerios"]
+            }
+          }
+        }
+,
+        {
+          "name": "Crear Ministerio",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ministerio de Alabanza\",\n  \"descripcion\": \"Ministerio de música y alabanza\",\n  \"lider_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ministerios",
+              "host": ["{{base_url}}"],
+              "path": ["ministerios"]
+            }
+          }
+        },
+        {
+          "name": "Asignar Persona a Ministerio",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_persona\": 2,\n  \"cargo\": \"Vocalista\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ministerios/1/miembros",
+              "host": ["{{base_url}}"],
+              "path": ["ministerios", "1", "miembros"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "item": [
+        {
+          "name": "Listar Eventos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/eventos?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["eventos"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear Evento",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Culto Dominical\",\n  \"tipo_evento\": \"CULTO\",\n  \"fecha_inicio\": \"2024-01-21T10:00:00Z\",\n  \"fecha_fin\": \"2024-01-21T12:00:00Z\",\n  \"lugar\": \"Templo Principal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/eventos",
+              "host": ["{{base_url}}"],
+              "path": ["eventos"]
+            }
+          }
+        }
+,
+        {
+          "name": "Registrar Asistencia",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asistencias\": [\n    {\n      \"id_persona\": 1,\n      \"asistio\": true,\n      \"observaciones\": \"Llegó puntual\"\n    },\n    {\n      \"id_persona\": 2,\n      \"asistio\": false,\n      \"observaciones\": \"Enfermo\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/eventos/1/asistencia",
+              "host": ["{{base_url}}"],
+              "path": ["eventos", "1", "asistencia"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Estadísticas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/eventos/1/estadisticas",
+              "host": ["{{base_url}}"],
+              "path": ["eventos", "1", "estadisticas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auditoría",
+      "item": [
+        {
+          "name": "Listar Auditoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auditoria?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["auditoria"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Auditoría por Tabla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auditoria/tabla/personas",
+              "host": ["{{base_url}}"],
+              "path": ["auditoria", "tabla", "personas"]
+            }
+          }
+        },
+        {
+          "name": "Historial de Registro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auditoria/registro/personas/1",
+              "host": ["{{base_url}}"],
+              "path": ["auditoria", "registro", "personas", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

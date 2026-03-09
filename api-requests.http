@@ -1,0 +1,558 @@
+###
+# API MICASA - Colección de Requests HTTP
+# 
+# Este archivo puede ser usado con:
+# - VS Code REST Client extension
+# - IntelliJ HTTP Client
+# - O cualquier herramienta compatible con formato .http
+#
+# Instrucciones:
+# 1. Instalar la extensión "REST Client" en VS Code
+# 2. Actualizar las variables @baseUrl y @token según tu entorno
+# 3. Hacer clic en "Send Request" sobre cada request
+###
+
+# Variables de entorno
+@baseUrl = http://localhost:3000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+###############################################################################
+# AUTENTICACIÓN
+###############################################################################
+
+### Login - Obtener token JWT
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "clave": "Admin123!"
+}
+
+### Obtener usuario actual
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Cambiar contraseña
+PUT {{baseUrl}}/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "claveActual": "Admin123!",
+  "claveNueva": "NuevaPassword456!"
+}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Authorization: Bearer {{token}}
+
+###############################################################################
+# PERSONAS
+###############################################################################
+
+### Listar personas (con paginación)
+GET {{baseUrl}}/personas?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener persona por ID
+GET {{baseUrl}}/personas/1
+Authorization: Bearer {{token}}
+
+### Buscar persona por identificación
+GET {{baseUrl}}/personas/identificacion/1234567890
+Authorization: Bearer {{token}}
+
+### Buscar personas por nombre
+GET {{baseUrl}}/personas/search?q=Juan
+Authorization: Bearer {{token}}
+
+### Crear persona
+POST {{baseUrl}}/personas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "primer_nombre": "María",
+  "segundo_nombre": "Elena",
+  "primer_apellido": "González",
+  "segundo_apellido": "López",
+  "identificacion": "9876543210",
+  "tipo_identificacion": "CC",
+  "genero": "F",
+  "fecha_nacimiento": "1995-03-20",
+  "estado_civil": "S",
+  "bautizado": false,
+  "celular": "3109876543",
+  "email": "maria.gonzalez@example.com",
+  "direccion": "Carrera 45 #12-34"
+}
+
+### Actualizar persona
+PUT {{baseUrl}}/personas/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "celular": "3209876543",
+  "direccion": "Nueva Dirección 123",
+  "email": "maria.nueva@example.com"
+}
+
+### Eliminar persona (soft delete)
+DELETE {{baseUrl}}/personas/2
+Authorization: Bearer {{token}}
+
+###############################################################################
+# USUARIOS
+###############################################################################
+
+### Listar usuarios
+GET {{baseUrl}}/usuarios?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener usuario por ID
+GET {{baseUrl}}/usuarios/1
+Authorization: Bearer {{token}}
+
+### Crear usuario
+POST {{baseUrl}}/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_persona": 2,
+  "usuario": "mgonzalez",
+  "clave": "Password123!"
+}
+
+### Actualizar usuario
+PUT {{baseUrl}}/usuarios/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "usuario": "maria.gonzalez"
+}
+
+### Eliminar usuario
+DELETE {{baseUrl}}/usuarios/2
+Authorization: Bearer {{token}}
+
+### Asignar rol a usuario
+POST {{baseUrl}}/usuarios/2/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_rol": 2
+}
+
+### Obtener roles de usuario
+GET {{baseUrl}}/usuarios/2/roles
+Authorization: Bearer {{token}}
+
+### Obtener permisos de usuario
+GET {{baseUrl}}/usuarios/2/permisos
+Authorization: Bearer {{token}}
+
+### Remover rol de usuario
+DELETE {{baseUrl}}/usuarios/2/roles/2
+Authorization: Bearer {{token}}
+
+###############################################################################
+# ROLES
+###############################################################################
+
+### Listar roles
+GET {{baseUrl}}/roles?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener rol por ID
+GET {{baseUrl}}/roles/1
+Authorization: Bearer {{token}}
+
+### Crear rol
+POST {{baseUrl}}/roles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Secretario",
+  "descripcion": "Gestiona información administrativa"
+}
+
+### Actualizar rol
+PUT {{baseUrl}}/roles/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descripcion": "Gestiona toda la información administrativa de la iglesia"
+}
+
+### Eliminar rol
+DELETE {{baseUrl}}/roles/3
+Authorization: Bearer {{token}}
+
+### Asignar permiso a rol
+POST {{baseUrl}}/roles/3/permisos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_permiso": 5
+}
+
+### Obtener permisos de rol
+GET {{baseUrl}}/roles/3/permisos
+Authorization: Bearer {{token}}
+
+### Remover permiso de rol
+DELETE {{baseUrl}}/roles/3/permisos/5
+Authorization: Bearer {{token}}
+
+###############################################################################
+# PERMISOS
+###############################################################################
+
+### Listar permisos
+GET {{baseUrl}}/permisos?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### Obtener permiso por ID
+GET {{baseUrl}}/permisos/1
+Authorization: Bearer {{token}}
+
+### Obtener permisos por módulo
+GET {{baseUrl}}/permisos/modulo/PERSONAS
+Authorization: Bearer {{token}}
+
+### Crear permiso
+POST {{baseUrl}}/permisos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "REPORTES_CREATE",
+  "descripcion": "Crear reportes",
+  "modulo": "REPORTES"
+}
+
+### Actualizar permiso
+PUT {{baseUrl}}/permisos/50
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descripcion": "Crear y generar reportes del sistema"
+}
+
+### Eliminar permiso
+DELETE {{baseUrl}}/permisos/50
+Authorization: Bearer {{token}}
+
+###############################################################################
+# MINISTERIOS
+###############################################################################
+
+### Listar ministerios
+GET {{baseUrl}}/ministerios?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener ministerio por ID
+GET {{baseUrl}}/ministerios/1
+Authorization: Bearer {{token}}
+
+### Crear ministerio
+POST {{baseUrl}}/ministerios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Ministerio de Alabanza",
+  "descripcion": "Ministerio encargado de la música y alabanza",
+  "lider_id": 1
+}
+
+### Actualizar ministerio
+PUT {{baseUrl}}/ministerios/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descripcion": "Ministerio encargado de la música, alabanza y adoración",
+  "lider_id": 2
+}
+
+### Eliminar ministerio
+DELETE {{baseUrl}}/ministerios/1
+Authorization: Bearer {{token}}
+
+### Asignar persona a ministerio
+POST {{baseUrl}}/ministerios/1/miembros
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_persona": 2,
+  "cargo": "Vocalista"
+}
+
+### Obtener miembros de ministerio
+GET {{baseUrl}}/ministerios/1/miembros
+Authorization: Bearer {{token}}
+
+### Actualizar cargo de miembro
+PUT {{baseUrl}}/ministerios/1/miembros/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cargo": "Líder de Alabanza"
+}
+
+### Remover persona de ministerio
+DELETE {{baseUrl}}/ministerios/1/miembros/2
+Authorization: Bearer {{token}}
+
+###############################################################################
+# FAMILIAS
+###############################################################################
+
+### Listar familias
+GET {{baseUrl}}/familias?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener familia por ID
+GET {{baseUrl}}/familias/1
+Authorization: Bearer {{token}}
+
+### Crear familia
+POST {{baseUrl}}/familias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Familia Pérez",
+  "direccion": "Calle 123 #45-67",
+  "telefono": "3001234567"
+}
+
+### Actualizar familia
+PUT {{baseUrl}}/familias/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "direccion": "Nueva Calle 456 #78-90",
+  "telefono": "3109876543"
+}
+
+### Eliminar familia
+DELETE {{baseUrl}}/familias/1
+Authorization: Bearer {{token}}
+
+### Agregar miembro a familia
+POST {{baseUrl}}/familias/1/miembros
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_persona": 1,
+  "parentesco": "PADRE",
+  "es_cabeza_familia": true
+}
+
+### Obtener miembros de familia
+GET {{baseUrl}}/familias/1/miembros
+Authorization: Bearer {{token}}
+
+### Actualizar parentesco de miembro
+PUT {{baseUrl}}/familias/1/miembros/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "parentesco": "ESPOSO",
+  "es_cabeza_familia": true
+}
+
+### Remover miembro de familia
+DELETE {{baseUrl}}/familias/1/miembros/1
+Authorization: Bearer {{token}}
+
+###############################################################################
+# CONTACTOS
+###############################################################################
+
+### Obtener contactos de persona
+GET {{baseUrl}}/contactos/persona/1
+Authorization: Bearer {{token}}
+
+### Obtener contacto por ID
+GET {{baseUrl}}/contactos/1
+Authorization: Bearer {{token}}
+
+### Crear contacto
+POST {{baseUrl}}/contactos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id_persona": 1,
+  "tipo_contacto": "WHATSAPP",
+  "valor": "3001234567",
+  "es_principal": false
+}
+
+### Actualizar contacto
+PUT {{baseUrl}}/contactos/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "valor": "3109876543"
+}
+
+### Eliminar contacto
+DELETE {{baseUrl}}/contactos/3
+Authorization: Bearer {{token}}
+
+### Establecer contacto como principal
+PUT {{baseUrl}}/contactos/3/principal
+Authorization: Bearer {{token}}
+
+###############################################################################
+# EVENTOS
+###############################################################################
+
+### Listar eventos
+GET {{baseUrl}}/eventos?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Obtener evento por ID
+GET {{baseUrl}}/eventos/1
+Authorization: Bearer {{token}}
+
+### Obtener eventos por rango de fechas
+GET {{baseUrl}}/eventos/fecha?start=2024-01-01&end=2024-01-31
+Authorization: Bearer {{token}}
+
+### Obtener eventos por ministerio
+GET {{baseUrl}}/eventos/ministerio/1
+Authorization: Bearer {{token}}
+
+### Crear evento
+POST {{baseUrl}}/eventos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Culto Dominical",
+  "descripcion": "Servicio de adoración dominical",
+  "tipo_evento": "CULTO",
+  "fecha_inicio": "2024-01-21T10:00:00Z",
+  "fecha_fin": "2024-01-21T12:00:00Z",
+  "lugar": "Templo Principal",
+  "id_ministerio": 1
+}
+
+### Actualizar evento
+PUT {{baseUrl}}/eventos/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "descripcion": "Servicio especial de adoración y alabanza",
+  "lugar": "Auditorio Principal"
+}
+
+### Eliminar evento
+DELETE {{baseUrl}}/eventos/1
+Authorization: Bearer {{token}}
+
+### Registrar asistencia a evento
+POST {{baseUrl}}/eventos/1/asistencia
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "asistencias": [
+    {
+      "id_persona": 1,
+      "asistio": true,
+      "observaciones": "Llegó puntual"
+    },
+    {
+      "id_persona": 2,
+      "asistio": false,
+      "observaciones": "Enfermo"
+    },
+    {
+      "id_persona": 3,
+      "asistio": true
+    }
+  ]
+}
+
+### Obtener asistencias de evento
+GET {{baseUrl}}/eventos/1/asistencia
+Authorization: Bearer {{token}}
+
+### Obtener estadísticas de asistencia
+GET {{baseUrl}}/eventos/1/estadisticas
+Authorization: Bearer {{token}}
+
+###############################################################################
+# AUDITORÍA
+###############################################################################
+
+### Listar registros de auditoría
+GET {{baseUrl}}/auditoria?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### Obtener auditoría por tabla
+GET {{baseUrl}}/auditoria/tabla/personas?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### Obtener auditoría por usuario
+GET {{baseUrl}}/auditoria/usuario/1?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### Obtener auditoría por rango de fechas
+GET {{baseUrl}}/auditoria/fecha?start=2024-01-01&end=2024-01-31&page=1&limit=20
+Authorization: Bearer {{token}}
+
+### Obtener historial de un registro
+GET {{baseUrl}}/auditoria/registro/personas/1
+Authorization: Bearer {{token}}
+
+###############################################################################
+# HEALTH CHECK
+###############################################################################
+
+### Health check - No requiere autenticación
+GET {{baseUrl}}/../health
+
+###############################################################################
+# DOCUMENTACIÓN
+###############################################################################
+
+### Obtener especificación OpenAPI (JSON)
+GET {{baseUrl}}/../api-docs.json
+
+###
+# NOTAS:
+# 
+# 1. Actualizar la variable @token después de hacer login
+# 2. Los IDs en las URLs deben ser reemplazados con IDs válidos de tu base de datos
+# 3. Todos los endpoints (excepto /health y /auth/login) requieren autenticación
+# 4. Rate limiting: 100 req/min general, 5 req/min para login
+# 5. Paginación: máximo 100 registros por página
+# 6. Fechas en formato ISO 8601: YYYY-MM-DD o YYYY-MM-DDTHH:mm:ssZ
+###

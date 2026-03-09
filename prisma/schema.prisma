@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model personas {
+  id_persona           Int       @id @default(autoincrement())
+  primer_nombre        String    @db.VarChar(50)
+  segundo_nombre       String?   @db.VarChar(50)
+  tercer_nombre        String?   @db.VarChar(50)
+  primer_apellido      String    @db.VarChar(50)
+  segundo_apellido     String?   @db.VarChar(50)
+  fecha_nacimiento     DateTime  @db.Date
+  genero               String    @db.VarChar(1)
+  bautizado            Boolean   @default(false)
+  fecha_bautizo        DateTime? @db.Date
+  identificacion       String    @unique @db.VarChar(20)
+  tipo_identificacion  String    @db.VarChar(3)
+  estado_civil         String    @db.VarChar(1)
+  celular              String?   @db.VarChar(20)
+  email                String?   @db.VarChar(100)
+  direccion            String?
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  usuarios           usuarios?
+  ministerio_lider   ministerio[]         @relation("ministerio_lider")
+  ministerio_persona ministerio_persona[]
+  familia_persona    familia_persona[]
+  contactos          contactos[]
+  asistencia_eventos asistencia_eventos[]
+
+  @@index([identificacion])
+  @@index([primer_nombre, primer_apellido])
+}
+
+model usuarios {
+  id_usuario           Int       @id @default(autoincrement())
+  id_persona           Int       @unique
+  usuario              String    @unique @db.VarChar(50)
+  clave                String    @db.VarChar(255)
+  estado               Boolean   @default(true)
+  ultimo_acceso        DateTime?
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  persona        personas         @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade)
+  usuarios_roles usuarios_roles[]
+  auditoria      auditoria[]
+
+  @@index([usuario])
+  @@index([id_persona])
+}
+
+model roles {
+  id_rol               Int       @id @default(autoincrement())
+  nombre               String    @unique @db.VarChar(50)
+  descripcion          String?
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  usuarios_roles usuarios_roles[]
+  roles_permisos roles_permisos[]
+}
+
+model usuarios_roles {
+  id_usuario_rol       Int       @id @default(autoincrement())
+  id_usuario           Int
+  id_rol               Int
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  usuarios usuarios @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  roles    roles    @relation(fields: [id_rol], references: [id_rol], onDelete: Restrict)
+
+  @@unique([id_usuario, id_rol])
+  @@index([id_usuario])
+  @@index([id_rol])
+}
+
+model permisos {
+  id_permiso           Int       @id @default(autoincrement())
+  nombre               String    @unique @db.VarChar(50)
+  descripcion          String?
+  modulo               String    @db.VarChar(50)
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  roles_permisos roles_permisos[]
+}
+
+model roles_permisos {
+  id_rol_permiso       Int       @id @default(autoincrement())
+  id_rol               Int
+  id_permiso           Int
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  roles    roles    @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade)
+  permisos permisos @relation(fields: [id_permiso], references: [id_permiso], onDelete: Cascade)
+
+  @@unique([id_rol, id_permiso])
+  @@index([id_rol])
+  @@index([id_permiso])
+}
+
+model ministerio {
+  id_ministerio        Int       @id @default(autoincrement())
+  nombre               String    @unique @db.VarChar(100)
+  descripcion          String?
+  lider_id             Int?
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  lider              personas?            @relation("ministerio_lider", fields: [lider_id], references: [id_persona], onDelete: SetNull)
+  ministerio_persona ministerio_persona[]
+  eventos            eventos[]
+
+  @@index([lider_id])
+}
+
+model ministerio_persona {
+  id_ministerio_persona Int       @id @default(autoincrement())
+  id_persona            Int
+  id_ministerio         Int
+  cargo                 String?   @db.VarChar(100)
+  estado                Boolean   @default(true)
+  fecha_inicio          DateTime  @default(now()) @db.Date
+  fecha_fin             DateTime? @db.Date
+  fecha_creacion        DateTime  @default(now())
+  fecha_modificacion    DateTime?
+  usuario_modificacion  Int?
+
+  persona    personas   @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade)
+  ministerio ministerio @relation(fields: [id_ministerio], references: [id_ministerio], onDelete: Cascade)
+
+  @@unique([id_persona, id_ministerio, fecha_inicio])
+  @@index([id_persona])
+  @@index([id_ministerio])
+}
+
+model familia {
+  id_familia           Int       @id @default(autoincrement())
+  nombre               String    @db.VarChar(100)
+  direccion            String?
+  telefono             String?   @db.VarChar(20)
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  familia_persona familia_persona[]
+}
+
+model familia_persona {
+  id_familia_persona   Int       @id @default(autoincrement())
+  id_persona           Int
+  id_familia           Int
+  parentesco           String    @db.VarChar(50)
+  es_cabeza_familia    Boolean   @default(false)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  persona personas @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade)
+  familia familia  @relation(fields: [id_familia], references: [id_familia], onDelete: Cascade)
+
+  @@unique([id_persona, id_familia])
+  @@index([id_persona])
+  @@index([id_familia])
+}
+
+model contactos {
+  id_contacto          Int       @id @default(autoincrement())
+  id_persona           Int
+  tipo_contacto        String    @db.VarChar(20)
+  valor                String    @db.VarChar(100)
+  es_principal         Boolean   @default(false)
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  persona personas @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade)
+
+  @@index([id_persona])
+}
+
+model eventos {
+  id_evento            Int       @id @default(autoincrement())
+  nombre               String    @db.VarChar(100)
+  descripcion          String?
+  tipo_evento          String?   @db.VarChar(50)
+  fecha_inicio         DateTime
+  fecha_fin            DateTime?
+  lugar                String?   @db.VarChar(200)
+  id_ministerio        Int?
+  estado               Boolean   @default(true)
+  fecha_creacion       DateTime  @default(now())
+  fecha_modificacion   DateTime?
+  usuario_modificacion Int?
+
+  ministerio         ministerio?          @relation(fields: [id_ministerio], references: [id_ministerio], onDelete: SetNull)
+  asistencia_eventos asistencia_eventos[]
+
+  @@index([fecha_inicio])
+  @@index([id_ministerio])
+}
+
+model asistencia_eventos {
+  id_asistencia  Int      @id @default(autoincrement())
+  id_evento      Int
+  id_persona     Int
+  asistio        Boolean  @default(false)
+  observaciones  String?
+  fecha_registro DateTime @default(now())
+
+  evento  eventos  @relation(fields: [id_evento], references: [id_evento], onDelete: Cascade)
+  persona personas @relation(fields: [id_persona], references: [id_persona], onDelete: Cascade)
+
+  @@unique([id_evento, id_persona])
+  @@index([id_evento])
+  @@index([id_persona])
+}
+
+model auditoria {
+  id_auditoria     Int      @id @default(autoincrement())
+  tabla            String   @db.VarChar(50)
+  id_registro      Int
+  accion           String   @db.VarChar(20)
+  datos_anteriores Json?    @db.JsonB
+  datos_nuevos     Json?    @db.JsonB
+  id_usuario       Int?
+  fecha_accion     DateTime @default(now())
+
+  usuario usuarios? @relation(fields: [id_usuario], references: [id_usuario], onDelete: SetNull)
+
+  @@index([tabla])
+  @@index([id_usuario])
+  @@index([fecha_accion])
+}
